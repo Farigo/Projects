@@ -1,0 +1,40 @@
+Please run the following commands in .NET Core CLI for creating the SQLite database:
+
+dotnet ef migrations add InitialCreate
+dotnet ef database update
+
+
+Example for adding data to database:
+
+{
+  "id": 1,
+  "name": "Apple Inc.",
+  "exchange": "NASDAQ",
+  "ticker": "APPL",
+  "isin": "US0378331005",
+  "website": "http://www.apple.com"
+}
+{
+  "id": 2,
+  "name": "British Airways Plc",
+  "exchange": "Pink Sheets",
+  "ticker": "BAIRY",
+  "isin": "US1104193065",
+  "website": "https://www.britishairways.com"
+}
+{
+  "id": 3,
+  "name": "Heineken NV",
+  "exchange": "Euronext Amsterdam",
+  "ticker": "HEIA",
+  "isin": "NL0000009165",
+  "website": ""
+}
+{
+  "id": 4,
+  "name": "Panasonic Corp",
+  "exchange": "Tokyo Stock Exchange",
+  "ticker": "6752",
+  "isin": "JP3866800000",
+  "website": "http://www.panasonic.co.jp"
+}

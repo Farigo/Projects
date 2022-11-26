@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Companies - Client side platform</title>
+        <link rel="stylesheet" href="css/bootstrap.min.css" />
+        <style>
+            .main {
+                width: 90%;
+                margin: auto;
+            }
+            .btn {
+                margin-right: 15px;
+            }
+            #id {
+                width: 60px;
+                margin-right: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="main">
+            <br>
+            <h3>Companies - Client side platform</h3>
+            <br>
+            <button id="show-all" class="btn btn-primary">Show all</button>
+            <button id="show-one" class="btn btn-primary">Show one</button><input type="number" id="id" min="1" value="">
+            <br><br>
+            <div id="mesaj"></div>
+            <form id="form-adding">
+                <input type="text" name="name" placeholder="name *">
+                <input type="text" name="exchange" placeholder="exchange *">
+                <input type="text" name="ticker" placeholder="ticker *">
+                <input type="text" name="isin" placeholder="isin *">
+                <input type="text" name="website" placeholder="website">
+                <input type="submit" value="Add one" id="add-one" class="btn btn-primary">
+            </form>
+            <table id="companies" class="table">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Exchange</th>
+                        <th>Ticker</th>
+                        <th>Isin</th>
+                        <th>Website</th>
+                        <th>Operation</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                </tbody>
+            </table>
+        </div>
+
+        <script src="js/jquery.min.js"></script>
+        <script>
+            $('#show-all').on('click', function(){
+                $.ajax({
+                    url: "http://localhost:5203/api/Companies",
+                    method: "GET",
+                    dataType: "JSON",
+                    success: function(response) {
+                        
+                        content = '';
+                        $.each( response, function(index, obj) {
+                            //console.log(obj.name);
+                            content += '<tr><td>' + obj.id + '</td><td>' + obj.name + '</td><td>' + obj.exchange + '</td><td>' + obj.ticker + '</td><td>' + obj.isin + '</td><td>' + obj.website + '</td><td><button class="remove btn btn-primary" id="' + obj.id + '">Remove</button></td></tr>';
+                        });
+                        $('tbody').html(content);
+                        //console.log(response);
+                    },
+                });
+            });
+            $('#show-one').on('click', function(){
+                id = parseInt($('#id').val());
+                if (id >= 1) {
+                    $.ajax({
+                        url: "http://localhost:5203/api/Companies/" + id,
+                        method: "GET",
+                        dataType: "JSON",
+                        error: function(xhr, status, error) {
+                            content = '';
+                            $('tbody').html(content);
+                            $('#mesaj').show();
+                            $('#mesaj').html('<div class="alert alert-danger">There is no company with id ' + id + '</div>').fadeOut(5000);
+                        },
+                        success: function(response) {
+                            if (obj = response) {
+                                //console.log(obj.name);
+                                content = '<tr><td>' + obj.id + '</td><td>' + obj.name + '</td><td>' + obj.exchange + '</td><td>' + obj.ticker + '</td><td>' + obj.isin + '</td><td>' + obj.website + '</td></tr>';
+
+                                $('tbody').html(content);
+                                //console.log(response);
+                            }
+                        },
+                    });
+                } else {
+                    $('#mesaj').show();
+                    $('#mesaj').html('<div class="alert alert-danger">The index must to be 1 or greater than 1</div>').fadeOut(5000);
+                    $('tbody').html('');
+                }
+            });
+            $('#add-one').on('click', function(e) {
+                e.preventDefault();
+                name = $('input[name="name"]').val().trim();
+                exchange = $('input[name="exchange"]').val().trim();
+                ticker = $('input[name="ticker"]').val().trim();
+                isin = $('input[name="isin"]').val().trim();
+                website = $('input[name="website"]').val().trim();
+                if (name && exchange && ticker && isin) {
+                    console.log(name);
+                    const obj = {name: name, exchange: exchange, ticker: ticker, isin: isin, website: website}; 
+                    companyJSON = JSON.stringify(obj);
+                    $.ajax({
+                        url: "http://localhost:5203/api/Companies/",
+                        method: "POST",
+                        contentType: "application/JSON",
+                        data: companyJSON,
+                        error: function(xhr, status, error) {
+                            content = '';
+                            $('tbody').html(content);
+                            $('#mesaj').show();
+                            $('#mesaj').html('<div class="alert alert-danger">There was an error. The new company was not added.</div>').fadeOut(5000);
+                        },
+                        success: function() {
+                            content = '';
+                            $('tbody').html(content);
+                            $('#mesaj').show();
+                            $('#mesaj').html('<div class="alert alert-danger">The new company was added succesfully.</div>').fadeOut(5000);
+
+                        },
+                    });
+                } else {
+                    $('#mesaj').show();
+                    $('#mesaj').html('<div class="alert alert-danger">The fields marked with * are mandatory.</div>').fadeOut(5000);
+                }
+            });
+            $('#companies').on('click', '.remove', function(){
+                id = parseInt($(this).attr('id'));
+                console.log(id);
+                console.log('*');
+                $.ajax({
+                    url: "http://localhost:5203/api/Companies/" + id,
+                    method: "DELETE",
+                    dataType: "JSON",
+                    error: function(xhr, status, error) {
+                        content = '';
+                        $('tbody').html(content);
+                        $('#mesaj').show();
+                        $('#mesaj').html('<div class="alert alert-danger">There was an error. The company with id ' + id + ' could not be removed.</div>').fadeOut(5000);
+                    },
+                    success: function(response) {
+                        
+                        $('#mesaj').show();
+                        $('#mesaj').html('<div class="alert alert-danger">The company with id ' + id + ' was removed succesfully.</div>').fadeOut(5000);
+                        $('#'+id).parents('tr').remove();
+                    },
+                });
+                
+            });
+            
+       </script>
+    </body>
+</html>
